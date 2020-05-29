@@ -7,6 +7,7 @@ from config import Config
 
 #def main():
 print("** STARTED **")
+Config.create_directories()
 env = make_env(env_name=Config.env_name, repeat=Config.repeat, clip_rewards=Config.clip_rewards,
                 no_ops=Config.no_ops, fire_first=Config.fire_first)
 best_score = -np.inf

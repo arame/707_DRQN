@@ -1,4 +1,5 @@
 from device import Device
+import os
 class Config:
     n_games = 1
     lr = 0.0001
@@ -18,9 +19,20 @@ class Config:
     no_ops = 0
     fire_first = False
     chkpt_dir='checkpoint'
+    plots_dir='plots'
     device, device_type = Device.get()
-    figure_file = 'plots/' + algo + '_' + env_name + '_lr' + str(lr) +'_'  + str(n_games) + 'games.png'
+    figure_file = plots_dir + '/' + algo + '_' + env_name + '_lr' + str(lr) +'_'  + str(n_games) + 'games.png'
 
+    @staticmethod
+    def create_directories():
+        Config.create_directory(Config.path)
+        Config.create_directory(Config.chkpt_dir)
+        Config.create_directory(Config.plots_dir)
+
+    @staticmethod
+    def create_directory(dir):
+        if os.path.isdir(dir) == False:
+            os.mkdir(dir)
 
     @staticmethod
     def print_settings():
