@@ -87,3 +87,16 @@ class DQNAgent(Agent):
 
         self.decay_epsilon()
 
+#  Deep Recurrent Q Agent
+class DRQNAgent(Agent):
+    def __init__(self, *args, **kwargs):
+        super(DRQNAgent, self).__init__(*args, **kwargs)
+
+        self.q_eval = DRecurrentQNetwork(self.n_actions, input_dims=self.input_dims, name=Config.get_name('_q_eval'))
+        self.q_next = DRecurrentQNetwork(self.n_actions, input_dims=self.input_dims, name=Config.get_name('_q_next'))
+
+    def choose_action(self, observation):
+        raise NotImplementedError
+
+    def learn(self):
+        raise NotImplementedError

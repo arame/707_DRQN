@@ -14,7 +14,7 @@ class Config:
     env_name = 'PongNoFrameskip-v4'
     path = 'models'
     load_checkpoint = False
-    algo = 'DQNAgent'
+    algo = 'DRQNAgent'
     clip_rewards = False
     no_ops = 0
     fire_first = False

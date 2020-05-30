@@ -53,4 +53,51 @@ class DeepQNetwork(nn.Module):
         print('... loading checkpoint ...')
         self.load_state_dict(T.load(self.checkpoint_file))
 
+class DRecurrentQNetwork(nn.Module):
+    def __init__(self, n_actions, name, input_dims):
+        super(DeepQNetwork, self).__init__()
+        self.checkpoint_dir = Config.chkpt_dir
+        self.checkpoint_file = os.path.join(self.checkpoint_dir, name)
+
+        self.conv1 = nn.Conv2d(input_dims[0], 32, 8, stride=4)
+        self.conv2 = nn.Conv2d(32, 64, 4, stride=2)
+        self.conv3 = nn.Conv2d(64, 64, 3, stride=1)
+        self.lstm_layer = nn.LSTM(input_size=512,hidden_size=512,num_layers=1,batch_first=True)
+
+        fc_input_dims = self.calculate_conv_output_dims(input_dims)
+
+        self.fc1 = nn.Linear(fc_input_dims, 512)
+        self.fc2 = nn.Linear(512, n_actions)
+
+        self.optimizer = optim.RMSprop(self.parameters(), lr=Config.lr)
+
+        self.loss = nn.MSELoss()
+        self.device = T.device(Config.device)
+        self.to(self.device)
+
+    def calculate_conv_output_dims(self, input_dims):
+        state = T.zeros(1, *input_dims)
+        dims = self.conv1(state)
+        dims = self.conv2(dims)
+        dims = self.conv3(dims)
+        return int(np.prod(dims.size()))
+
+    def forward(self, state):
+        conv1 = F.relu(self.conv1(state))
+        conv2 = F.relu(self.conv2(conv1))
+        conv3 = F.relu(self.conv3(conv2))
+        conv_state = conv3.view(conv3.size()[0], -1)
+
+        flat1 = F.relu(self.fc1(conv_state))
+        actions = self.fc2(flat1)
+
+        return actions
+
+    def save_checkpoint(self):
+        print('... saving checkpoint ...')
+        T.save(self.state_dict(), self.checkpoint_file)
+
+    def load_checkpoint(self):
+        print('... loading checkpoint ...')
+        self.load_state_dict(T.load(self.checkpoint_file))
 
